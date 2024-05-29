@@ -1,19 +1,22 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
-	"io/ioutil"
 	"os"
 )
 
 func main() {
 	// read text function
 	rt := func(f *os.File) {
-		s, er := ioutil.ReadAll(f)
-		if er != nil {
-			panic(er)
+		r := bufio.NewReaderSize(f, 4096)
+		for i := 1; true; i++ {
+			s, _, er := r.ReadLine()
+			if er != nil {
+				break
+			}
+			fmt.Println(i, ":", string(s))
 		}
-		fmt.Println(string(s))
 	}
 
 	fn := "data.txt"
