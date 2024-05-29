@@ -1,34 +1,23 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
+	"io/ioutil"
+	"net/http"
 )
 
 func main() {
-	// read text function
-	rt := func(f *os.File) {
-		r := bufio.NewReaderSize(f, 4096)
-		for i := 1; true; i++ {
-			s, _, er := r.ReadLine()
-			if er != nil {
-				break
-			}
-			fmt.Println(i, ":", string(s))
-		}
+	p := "https://golang.org"
+	re, er := http.Get(p)
+	if er != nil {
+		panic(er)
 	}
+	defer re.Body.Close()
 
-	fn := "data.txt"
-
-	f, er := os.OpenFile(fn, os.O_RDONLY, os.ModePerm)
+	s, er := ioutil.ReadAll(re.Body)
 	if er != nil {
 		panic(er)
 	}
 
-	fmt.Println("<<< start >>>")
-	rt(f)
-	fmt.Println("<<< end >>>")
-
-	defer f.Close()
+	fmt.Println(string(s))
 }
