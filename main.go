@@ -1,42 +1,45 @@
 package main
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"net/http"
+	"database/sql"
+	"fmt"
+	"strconv"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
-func main() {
-	p := "https://tuyano-dummy-data.firebaseio.com/mydata.json"
-	re, er := http.Get(p)
-	if er != nil {
-		panic(er)
-	}
-	defer re.Body.Close()
-
-	s, er := ioutil.ReadAll(re.Body)
-	if er != nil {
-		panic(er)
-	}
-
-	var itms []Mydata
-	er = json.Unmarshal(s, &itms)
-	if er != nil {
-		panic(er)
-	}
-
-	for i, im := range itms {
-		println(i, im.Str())
-	}
-}
-
+// MYdata is json struct
 type Mydata struct {
+	ID   int
 	Name string
 	Mail string
-	Tel  string
+	Age  int
 }
 
-// Str get string value.
+// Str get string value
 func (m *Mydata) Str() string {
-	return "<\"" + m.Name + "\" " + m.Mail + " " + m.Tel + ">"
+	return "<\"" + strconv.Itoa(m.ID) + ":" + m.Name + "\" " + m.Mail + "," + strconv.Itoa(m.Age) + ">"
+}
+
+func main() {
+	con, er := sql.Open("sqlite3", "data.sqlite3")
+	if er != nil {
+		panic(er)
+	}
+	defer con.Close()
+
+	q := "select * from mydata"
+	rs, er := con.Query(q)
+	if er != nil {
+		panic(er)
+	}
+	for rs.Next() {
+		var md Mydata
+		er := rs.Scan(&md.ID, &md.Name, &md.Mail, &md.Age)
+		if er != nil {
+			panic(er)
+		}
+		fmt.Println(md.Str())
+	}
+
 }
