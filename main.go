@@ -21,7 +21,7 @@ func (m *Mydata) Str() string {
 	return "<\"" + strconv.Itoa(m.ID) + ":" + m.Name + "\" " + m.Mail + "," + strconv.Itoa(m.Age) + ">"
 }
 
-var qry string = "select * from mydata where id = ?"
+var qry string = "select * from mydata where name like ?"
 
 func main() {
 	con, er := sql.Open("sqlite3", "data.sqlite3")
@@ -30,23 +30,21 @@ func main() {
 	}
 	defer con.Close()
 
-	s := "2" // input id
+	s := "ro" // input
 	if s == "" {
 		panic("no input")
 	}
-	n, er := strconv.Atoi(s)
-	if er != nil {
-		panic(er)
-	}
-	rs := con.QueryRow(qry, n)
+	rs, er := con.Query(qry, "%"+s+"%")
 	if er != nil {
 		panic(er)
 	}
 
-	var md Mydata
-	er2 := rs.Scan(&md.ID, &md.Name, &md.Mail, &md.Age)
-	if er != nil {
-		panic(er2)
+	for rs.Next() {
+		var md Mydata
+		er := rs.Scan(&md.ID, &md.Name, &md.Mail, &md.Age)
+		if er != nil {
+			panic(er)
+		}
+		fmt.Println(md.Str())
 	}
-	fmt.Println(md.Str())
 }
