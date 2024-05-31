@@ -35,26 +35,9 @@ func main() {
 	if er != nil {
 		panic(er)
 	}
-	qry := "select * from mydata where id = ?"
-	rw := con.QueryRow(qry, id)
-	tgt := mydatafmRw(rw)
-	nm := "JiroJiro"  // input
-	ml := "jiro@jiro" // input
-	ge := "25"        // input
-	ag, _ := strconv.Atoi(ge)
 
-	if nm == "" {
-		nm = tgt.Name
-	}
-	if ml == "" {
-		ml = tgt.Mail
-	}
-	if ge == "" {
-		ag = tgt.Age
-	}
-
-	qry = "update mydata set name = ?, mail = ?, age = ? where id = ?"
-	con.Exec(qry, nm, ml, ag, id)
+	qry := "delete from mydata where id = ?"
+	con.Exec(qry, id)
 	showRecord(con)
 }
 
