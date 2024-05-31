@@ -38,17 +38,15 @@ func main() {
 	if er != nil {
 		panic(er)
 	}
-	rs, er := con.Query(qry, n)
+	rs := con.QueryRow(qry, n)
 	if er != nil {
 		panic(er)
 	}
-	for rs.Next() {
-		var md Mydata
-		er := rs.Scan(&md.ID, &md.Name, &md.Mail, &md.Age)
-		if er != nil {
-			panic(er)
-		}
-		fmt.Println(md.Str())
+
+	var md Mydata
+	er2 := rs.Scan(&md.ID, &md.Name, &md.Mail, &md.Age)
+	if er != nil {
+		panic(er2)
 	}
-	fmt.Println("*** end ***")
+	fmt.Println(md.Str())
 }
