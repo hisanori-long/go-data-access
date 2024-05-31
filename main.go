@@ -21,6 +21,8 @@ func (m *Mydata) Str() string {
 	return "<\"" + strconv.Itoa(m.ID) + ":" + m.Name + "\" " + m.Mail + "," + strconv.Itoa(m.Age) + ">"
 }
 
+var qry string = "select * from mydata where id = ?"
+
 func main() {
 	con, er := sql.Open("sqlite3", "data.sqlite3")
 	if er != nil {
@@ -28,8 +30,15 @@ func main() {
 	}
 	defer con.Close()
 
-	q := "select * from mydata"
-	rs, er := con.Query(q)
+	s := "2" // input id
+	if s == "" {
+		panic("no input")
+	}
+	n, er := strconv.Atoi(s)
+	if er != nil {
+		panic(er)
+	}
+	rs, er := con.Query(qry, n)
 	if er != nil {
 		panic(er)
 	}
@@ -41,5 +50,5 @@ func main() {
 		}
 		fmt.Println(md.Str())
 	}
-
+	fmt.Println("*** end ***")
 }
